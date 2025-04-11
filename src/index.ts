@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { User } from "./types/users";
 import { createUser, userExistsWithEmail, users } from "./db/users";
 
 const express = require("express");
