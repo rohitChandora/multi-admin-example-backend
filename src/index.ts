@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-import { createUser, userExistsWithEmail, users } from "./db/users";
+import { userExistsWithEmail, users } from "./db/users";
 import {
   createVerificationToken,
   deleteVerificationToken,
@@ -8,6 +8,7 @@ import {
 } from "./db/verificationTokens";
 import { send } from "process";
 import { sendVerificationEmail } from "./lib/accountVerification";
+import { userController } from "./controllers/userController";
 
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -21,9 +22,7 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!");
 });
 
-app.get("/users", (req: Request, res: Response) => {
-  res.json(users);
-});
+app.get("/users", userController.getUsers);
 
 app.get("/verify", (req: Request, res: Response) => {
   const { token } = req.query;
@@ -41,28 +40,7 @@ app.get("/verify", (req: Request, res: Response) => {
   res.json({ message: "Email verified" });
 });
 
-app.post("/users", (req: Request, res: Response) => {
-  const { email, password, name } = req.body;
-
-  if (userExistsWithEmail(email)) {
-    return res.status(400).json({ message: "Email not available" });
-  }
-
-  const user = createUser({
-    name,
-    email,
-    password,
-    emailVerified: false,
-  });
-
-  if (user) {
-    const verificationToken = createVerificationToken(user.id);
-    sendVerificationEmail(user.email, verificationToken.token);
-  }
-
-  res.json({ message: "User created" });
-  //create user
-});
+app.post("/users", userController.createUser);
 
 app.post("/users/update/:id", (req: Request, res: Response) => {});
 
