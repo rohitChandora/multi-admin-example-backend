@@ -1,5 +1,5 @@
 import { getID } from "../lib/helpers";
-import { User } from "../types/users";
+import { User, VerificationToken } from "../types/users";
 
 export const users: User[] = [];
 
@@ -18,6 +18,7 @@ export function createUser(
     deletedAt: null,
   };
   users.push(newUser);
+  return newUser;
 }
 
 export function userExistsWithEmail(email: string) {

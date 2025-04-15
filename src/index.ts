@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { User } from "./types/users";
 import { createUser, userExistsWithEmail, users } from "./db/users";
 
 const express = require("express");
@@ -13,24 +14,25 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!");
 });
 
-app.get("/users", (req: Request, res: Response) => {
-  res.json(users);
-});
+app.get("/users", userController.getUsers);
 
-app.post("/users", (req: Request, res: Response) => {
-  const { email, password, name } = req.body;
-
-  if (userExistsWithEmail(email)) {
-    return res.status(400).json({ message: "Email not available" });
+app.get("/verify", (req: Request, res: Response) => {
+  const { token } = req.query;
+  const verificationToken = getVerificationToken(token as string);
+  if (!verificationToken) {
+    return res.status(400).json({ message: "Invalid token" });
   }
-  createUser({
-    name,
-    email,
-    password,
-  });
-  res.json({ message: "User created" });
-  //create user
+  const user = users.find((user) => user.id === verificationToken.userId);
+  if (!user) {
+    return res.status(400).json({ message: "User not found" });
+  }
+  user.emailVerified = true;
+  user.updatedAt = new Date();
+  deleteVerificationToken(token as string);
+  res.json({ message: "Email verified" });
 });
+
+app.post("/users", userController.createUser);
 
 app.post("/users/update/:id", (req: Request, res: Response) => {});
 
@@ -38,6 +40,8 @@ app.post("/users/delete/:id", (req: Request, res: Response) => {
   //delete user
 });
 
-app.listen(port, () => {
+app.listen(port, async () => {
+  console.log(process.env.DATABASE_SERVER, "connecting to db");
+  await mongoose.connect(process.env.DATABASE_SERVER as string);
   console.log(`Example app listening on port ${port}`);
 });
