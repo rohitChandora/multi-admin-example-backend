@@ -1,39 +1,43 @@
-import { getID } from "../lib/helpers";
+import mongoose from "mongoose";
+import { users } from "../db/users";
+import { verificationTokens } from "../db/verificationTokens";
 
-const users: User[] = [];
+const { Schema } = mongoose;
 
-export class User {
-  public id: number | undefined;
-  public createdAt: Date | undefined;
-  public updatedAt: Date | undefined;
-  public deletedAt: Date | null | undefined;
-  public emailVerified: boolean | undefined;
+const userSchema = new Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  emailVerified: {
+    type: Boolean,
+    default: false,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
+  verificationTokens: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "VerificationToken",
+    },
+  ],
+});
 
-  constructor(
-    public name: string,
-    public email: string,
-    public password: string
-  ) {}
+const User = mongoose.model("User", userSchema);
 
-  create() {
-    this.id = getID();
-    this.createdAt = new Date();
-    this.updatedAt = new Date();
-    this.deletedAt = null;
-    this.emailVerified = false;
-    return this;
-  }
-
-  save() {
-    users.push(this);
-    return this;
-  }
-
-  static find() {
-    return users;
-  }
-
-  static findById(id: number) {
-    return users.find((user) => user.id === id);
-  }
-}
+export { User };

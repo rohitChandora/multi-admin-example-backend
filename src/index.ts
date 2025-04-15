@@ -2,13 +2,12 @@ import { Request, Response } from "express";
 
 import { userExistsWithEmail, users } from "./db/users";
 import {
-  createVerificationToken,
   deleteVerificationToken,
   getVerificationToken,
 } from "./db/verificationTokens";
-import { send } from "process";
-import { sendVerificationEmail } from "./lib/accountVerification";
 import { userController } from "./controllers/userController";
+import mongoose from "mongoose";
+require("dotenv").config();
 
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -48,6 +47,8 @@ app.post("/users/delete/:id", (req: Request, res: Response) => {
   //delete user
 });
 
-app.listen(port, () => {
+app.listen(port, async () => {
+  console.log(process.env.DATABASE_SERVER, "connecting to db");
+  await mongoose.connect(process.env.DATABASE_SERVER as string);
   console.log(`Example app listening on port ${port}`);
 });
