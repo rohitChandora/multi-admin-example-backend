@@ -7,6 +7,7 @@ import {
 } from "./db/verificationTokens";
 import { userController } from "./controllers/userController";
 import mongoose from "mongoose";
+import { verificationTokenController } from "./controllers/verificationTokenController";
 require("dotenv").config();
 
 const express = require("express");
@@ -23,21 +24,7 @@ app.get("/", (req: Request, res: Response) => {
 
 app.get("/users", userController.getUsers);
 
-app.get("/verify", (req: Request, res: Response) => {
-  const { token } = req.query;
-  const verificationToken = getVerificationToken(token as string);
-  if (!verificationToken) {
-    return res.status(400).json({ message: "Invalid token" });
-  }
-  const user = users.find((user) => user.id === verificationToken.userId);
-  if (!user) {
-    return res.status(400).json({ message: "User not found" });
-  }
-  user.emailVerified = true;
-  user.updatedAt = new Date();
-  deleteVerificationToken(token as string);
-  res.json({ message: "Email verified" });
-});
+app.get("/verify", verificationTokenController.verifyToken);
 
 app.post("/users", userController.createUser);
 

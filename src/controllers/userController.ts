@@ -29,7 +29,8 @@ export const createUser = async (req: Request, res: Response) => {
     name,
     verificationTokens: [verificationToken._id],
   });
-  sendVerificationEmail(user.email, verificationToken.token);
+
+  await sendVerificationEmail(user.email, verificationToken.token);
 
   res.json({ message: "User created", user });
 };
