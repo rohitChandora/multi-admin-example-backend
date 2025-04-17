@@ -1,7 +1,8 @@
 import { userExistsWithEmail } from "../db/users";
-import { createVerificationToken } from "../db/verificationTokens";
+
 import { sendVerificationEmail } from "../lib/accountVerification";
 import { User } from "../models/User";
+import bcrypt from "bcrypt";
 
 import { Request, Response } from "express";
 import { VerificationToken } from "../models/VerificationToken";
@@ -23,9 +24,11 @@ export const createUser = async (req: Request, res: Response) => {
     token: v6(),
   });
 
+  const hashedPassword = bcrypt.hashSync(password, 10);
+
   const user = await User.create({
     email,
-    password,
+    password: hashedPassword,
     name,
     verificationTokens: [verificationToken._id],
   });

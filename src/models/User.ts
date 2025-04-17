@@ -36,6 +36,11 @@ const userSchema = new Schema({
       ref: "VerificationToken",
     },
   ],
+  accessTokens: [
+    {
+      type: String,
+    },
+  ],
 });
 
 const User = mongoose.model("User", userSchema);
