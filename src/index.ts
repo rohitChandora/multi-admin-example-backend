@@ -5,6 +5,7 @@ import { userController } from "./controllers/userController";
 import mongoose from "mongoose";
 import { verificationTokenController } from "./controllers/verificationTokenController";
 import { transporter } from "./lib/email";
+import { authController } from "./controllers/authController";
 
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -17,6 +18,8 @@ app.use(bodyParser.json());
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!");
 });
+
+app.post("/auth/login", authController.login);
 
 app.get("/users", userController.getUsers);
 

@@ -1,8 +1,12 @@
 import { Request, Response } from "express";
 import { VerificationToken } from "../models/VerificationToken";
 import { User } from "../models/User";
+import { validateAccessToken } from "../lib/helpers";
 
 export async function verifyToken(req: Request, res: Response) {
+  if (!(await validateAccessToken(req))) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
   const { token } = req.query;
   const verificationToken = await VerificationToken.findOne({ token: token });
 
