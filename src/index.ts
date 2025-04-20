@@ -6,32 +6,29 @@ import mongoose from "mongoose";
 import { verificationTokenController } from "./controllers/verificationTokenController";
 import { transporter } from "./lib/email";
 import { authController } from "./controllers/authController";
+import cors from "cors";
+import { userRoutes } from "./routes";
+import { validateAccessToken } from "./lib/helpers";
+import { getCurrentUser } from "./middleware/getCurrentUser";
+import { User } from "./models/User";
 
 const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
 const port = 3000;
 console.log("starting server");
-
+app.use(cors());
 app.use(bodyParser.json());
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!");
 });
 
+app.use("/api/v1/users", userController.getUsers);
+
 app.post("/auth/login", authController.login);
 
-app.get("/users", userController.getUsers);
-
-app.get("/verify", verificationTokenController.verifyToken);
-
-app.post("/users", userController.createUser);
-
-app.post("/users/update/:id", (req: Request, res: Response) => {});
-
-app.post("/users/delete/:id", (req: Request, res: Response) => {
-  //delete user
-});
+app.use("/users", [validateAccessToken], userRoutes);
 
 app.listen(port, async () => {
   transporter

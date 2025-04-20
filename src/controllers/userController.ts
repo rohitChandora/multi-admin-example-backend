@@ -8,16 +8,19 @@ import { Request, Response } from "express";
 import { VerificationToken } from "../models/VerificationToken";
 import { v6 } from "uuid";
 
-export const getUsers = (req: Request, res: Response) => {
-  const users = User.find();
+export const getUsers = async (req: Request, res: Response) => {
+  const users = await User.find();
   res.json(users);
 };
 
 export const createUser = async (req: Request, res: Response) => {
   const { email, password, name } = req.body;
 
-  if (userExistsWithEmail(email)) {
-    return res.status(400).json({ message: "Email not available" });
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    return res
+      .status(400)
+      .json({ message: "A user with the email address already exists" });
   }
 
   const verificationToken = await VerificationToken.create({

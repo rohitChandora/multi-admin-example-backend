@@ -8,6 +8,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
+  "files": ["src/types/custom.d.ts"],
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]
 }
