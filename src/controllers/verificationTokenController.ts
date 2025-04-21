@@ -8,6 +8,9 @@ export async function verifyToken(req: Request, res: Response) {
     return res.status(401).json({ message: "Unauthorized" });
   }
   const { token } = req.query;
+  console.log(req.query, "query params");
+  console.log(token, "token");
+
   const verificationToken = await VerificationToken.findOne({ token: token });
 
   console.log("verificationToken detail: ", verificationToken);

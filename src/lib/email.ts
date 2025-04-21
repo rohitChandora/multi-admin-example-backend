@@ -14,7 +14,7 @@ export async function sendEmail(to: string, subject: string, body: string) {
   // Simulate sending an email
   try {
     await transporter.sendMail({
-      from: '"MBA" <no-reply@mba.email>', // sender address
+      from: '"MBA" <rohit.chandora@test-65qngkdddo8lwr12.mlsender.net>', // sender address
       to, // list of receivers
       subject,
       html: body, // html body

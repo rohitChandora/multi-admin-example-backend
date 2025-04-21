@@ -1,6 +1,4 @@
 import mongoose from "mongoose";
-import { users } from "../db/users";
-import { verificationTokens } from "../db/verificationTokens";
 
 const { Schema } = mongoose;
 

@@ -1,11 +1,10 @@
 require("dotenv").config();
 import { Request, Response } from "express";
-
 import { userController } from "./controllers/userController";
 import mongoose from "mongoose";
 import { verificationTokenController } from "./controllers/verificationTokenController";
-import { transporter } from "./lib/email";
 import { authController } from "./controllers/authController";
+import { postController } from "./controllers/postController";
 
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -32,6 +31,8 @@ app.post("/users/update/:id", (req: Request, res: Response) => {});
 app.post("/users/delete/:id", (req: Request, res: Response) => {
   //delete user
 });
+
+app.post("/post", postController.createPost);
 
 app.listen(port, async () => {
   console.log(process.env.DATABASE_SERVER, "connecting to db");
