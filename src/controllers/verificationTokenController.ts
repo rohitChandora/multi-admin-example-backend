@@ -4,9 +4,6 @@ import { User } from "../models/User";
 import { validateAccessToken } from "../lib/helpers";
 
 export async function verifyToken(req: Request, res: Response) {
-  if (!(await validateAccessToken(req))) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
   const { token } = req.query;
   console.log(req.query, "query params");
   console.log(token, "token");

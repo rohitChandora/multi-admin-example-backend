@@ -4,19 +4,20 @@ import { userController } from "./controllers/userController";
 import mongoose from "mongoose";
 import { verificationTokenController } from "./controllers/verificationTokenController";
 import { authController } from "./controllers/authController";
-import { postController } from "./controllers/postController";
 
 const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
 const port = 3000;
 console.log("starting server");
-
+app.use(cors());
 app.use(bodyParser.json());
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!");
 });
+
+app.use("/api/v1/users", userController.getUsers);
 
 app.post("/auth/login", authController.login);
 
@@ -31,8 +32,6 @@ app.post("/users/update/:id", (req: Request, res: Response) => {});
 app.post("/users/delete/:id", (req: Request, res: Response) => {
   //delete user
 });
-
-app.post("/post", postController.createPost);
 
 app.listen(port, async () => {
   console.log(process.env.DATABASE_SERVER, "connecting to db");

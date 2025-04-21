@@ -1,4 +1,4 @@
-import { Request } from "express";
+import { NextFunction, Request, Response } from "express";
 import { User } from "../models/User";
 
 export const getID = (function () {
@@ -8,10 +8,16 @@ export const getID = (function () {
   };
 })();
 
-export async function validateAccessToken(req: Request): Promise<Boolean> {
+export async function validateAccessToken(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   const accessTokenHeader = req.headers["authorization"];
   if (!accessTokenHeader) {
-    return false;
+    return res.status(401).json({
+      message: "Access token is missing",
+    });
   }
 
   const accessToken = (accessTokenHeader as string).split(" ")[1];
@@ -19,8 +25,12 @@ export async function validateAccessToken(req: Request): Promise<Boolean> {
     accessTokens: accessToken,
   });
   if (!userWithAccessToken) {
-    return false;
+    return res.status(401).json({
+      message: "Invalid access token",
+    });
   }
 
-  return true;
+  req.currentUser = userWithAccessToken;
+
+  next();
 }
