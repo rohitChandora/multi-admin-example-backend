@@ -3,14 +3,15 @@ import { Request, Response } from "express";
 
 import { userController } from "./controllers/userController";
 import mongoose from "mongoose";
-import { verificationTokenController } from "./controllers/verificationTokenController";
+
 import { transporter } from "./lib/email";
 import { authController } from "./controllers/authController";
 import cors from "cors";
 import { userRoutes } from "./routes";
 import { validateAccessToken } from "./lib/helpers";
-import { getCurrentUser } from "./middleware/getCurrentUser";
-import { User } from "./models/User";
+
+import { queue } from "./lib/queue";
+import "./lib/worker";
 
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -30,6 +31,29 @@ app.post("/auth/login", authController.login);
 
 app.use("/users", [validateAccessToken], userRoutes);
 
+app.get("/test/queue", async (req: Request, res: Response) => {
+  await queue.add("handle-verification", {
+    test: "testing",
+    url: "/test/queue",
+  });
+  res.json({ message: "Job added to queue" });
+});
+
+app.post("/verify-email", async (req: Request, res: Response) => {
+  await queue.add("verify-email", {
+    email: req.body.email,
+    token: req.body.token,
+  });
+  res.json({ message: "verification email sent successfully" });
+});
+
+app.post("/change-password", async (req: Request, res: Response) => {
+  await queue.add("password-change", {
+    email: req.body.email,
+    token: req.body.token,
+  });
+  res.json({ message: "password change email sent successfully" });
+});
 app.listen(port, async () => {
   transporter
     .verify()
@@ -40,3 +64,13 @@ app.listen(port, async () => {
   await mongoose.connect(process.env.DATABASE_SERVER as string);
   console.log(`Example app listening on port ${port}`);
 });
+
+async function shutdown() {
+  console.log("SIGTERM signal received: closing HTTP server");
+  //await redisClient.quit();
+  await mongoose.connection.close();
+  process.exit(0);
+}
+
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);

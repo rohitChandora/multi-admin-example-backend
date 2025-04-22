@@ -1,5 +1,3 @@
-import { userExistsWithEmail } from "../db/users";
-
 import { sendVerificationEmail } from "../lib/accountVerification";
 import { User } from "../models/User";
 import bcrypt from "bcrypt";
@@ -7,6 +5,7 @@ import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import { VerificationToken } from "../models/VerificationToken";
 import { v6 } from "uuid";
+import { queue } from "../lib/queue";
 
 export const getUsers = async (req: Request, res: Response) => {
   const users = await User.find();
@@ -36,7 +35,8 @@ export const createUser = async (req: Request, res: Response) => {
     verificationTokens: [verificationToken._id],
   });
 
-  await sendVerificationEmail(user.email, verificationToken.token);
+  //fire event user created
+  //await sendVerificationEmail(user.email, verificationToken.token);
 
   res.json({ message: "User created", user });
 };
