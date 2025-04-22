@@ -1,9 +1,16 @@
 require("dotenv").config();
 import { Request, Response } from "express";
+
 import { userController } from "./controllers/userController";
 import mongoose from "mongoose";
 import { verificationTokenController } from "./controllers/verificationTokenController";
+import { transporter } from "./lib/email";
 import { authController } from "./controllers/authController";
+import cors from "cors";
+import { userRoutes } from "./routes";
+import { validateAccessToken } from "./lib/helpers";
+import { getCurrentUser } from "./middleware/getCurrentUser";
+import { User } from "./models/User";
 
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -21,20 +28,15 @@ app.use("/api/v1/users", userController.getUsers);
 
 app.post("/auth/login", authController.login);
 
-app.get("/users", userController.getUsers);
-
-app.get("/verify", verificationTokenController.verifyToken);
-
-app.post("/users", userController.createUser);
-
-app.post("/users/update/:id", (req: Request, res: Response) => {});
-
-app.post("/users/delete/:id", (req: Request, res: Response) => {
-  //delete user
-});
+app.use("/users", [validateAccessToken], userRoutes);
 
 app.listen(port, async () => {
-  console.log(process.env.DATABASE_SERVER, "connecting to db");
+  transporter
+    .verify()
+    .then(() => {
+      console.log("SMTP Server is ready to take messages");
+    })
+    .catch(console.error);
   await mongoose.connect(process.env.DATABASE_SERVER as string);
   console.log(`Example app listening on port ${port}`);
 });
