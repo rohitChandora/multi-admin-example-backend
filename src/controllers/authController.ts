@@ -24,10 +24,7 @@ export const login = async (req: Request, res: Response) => {
   user.updatedAt = new Date();
   await user.save();
 
-  res.json({
-    message: "Login successful",
-    accessToken,
-  });
+  res.success(accessToken, "Login successful");
 };
 
 export const authController = {
