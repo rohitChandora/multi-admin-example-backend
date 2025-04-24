@@ -5,11 +5,17 @@ import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import { VerificationToken } from "../models/VerificationToken";
 import { v6 } from "uuid";
-import { queue } from "../lib/queue";
+
+import createHttpError from "http-errors";
+import { eventBus } from "../lib/eventBus";
+import { EVENTS } from "../lib/constants";
 
 export const getUsers = async (req: Request, res: Response) => {
-  const users = await User.find();
-  res.json(users);
+  const users = await User.find({ email: "dljfkl@kljdkl.com" });
+  if (users.length === 0) {
+    res.error(createHttpError.Unauthorized("No users found"));
+  }
+  res.success({ users });
 };
 
 export const createUser = async (req: Request, res: Response) => {
@@ -35,6 +41,7 @@ export const createUser = async (req: Request, res: Response) => {
     verificationTokens: [verificationToken._id],
   });
 
+  eventBus.emit(EVENTS["user::created"], { user, verificationToken });
   //fire event user created
   //await sendVerificationEmail(user.email, verificationToken.token);
 
