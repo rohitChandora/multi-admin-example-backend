@@ -1,4 +1,7 @@
 import createHttpError from "http-errors";
+import http from "http";
+import { WebSocketServer } from "ws";
+
 const express = require("express");
 
 express.response.success = function (data: any, message = "Success") {
@@ -21,4 +24,28 @@ express.response.error = function (err: any, context?: Record<string, any>) {
 };
 
 const app = express();
-export default app;
+const server = http.createServer(app);
+const wss = new WebSocketServer({ server });
+
+wss.on("connection", (ws) => {
+  console.log("New client connected");
+
+  ws.send(JSON.stringify({ message: "Welcome, client!" }));
+
+  // Listen to messages from client
+  ws.on("message", (data) => {
+    console.log("Received from client:", data.toString());
+    // Echo the message to all clients
+    wss.clients.forEach((client) => {
+      if (client.readyState === ws.OPEN) {
+        client.send(data.toString());
+      }
+    });
+  });
+
+  ws.on("close", () => {
+    console.log("Client disconnected");
+  });
+});
+
+export { app, server };

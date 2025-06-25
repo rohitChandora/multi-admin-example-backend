@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { userController } from "../controllers/userController";
 import { verificationTokenController } from "../controllers/verificationTokenController";
-import { User } from "../models/User";
 const expres = require("express");
 
 const router = expres.Router();
@@ -11,6 +10,10 @@ router.get("", userController.getUsers);
 router.get("/verify", verificationTokenController.verifyToken);
 
 router.post("/", userController.createUser);
+router.get("/currentUser", userController.getCurrentUser);
+
+router.post("/subscribe", userController.subscribeChannel);
+router.get("/:userId/channels", userController.getUserSubscriptions);
 
 router.patch("/update/:id", async (req: Request, res: Response) => {
   const { id } = req.params;

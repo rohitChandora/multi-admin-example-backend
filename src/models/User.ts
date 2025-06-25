@@ -28,6 +28,9 @@ const userSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  subscribedConversations: [
+    { type: mongoose.Schema.Types.ObjectId, ref: "Conversation" },
+  ],
   verificationTokens: [
     {
       type: Schema.Types.ObjectId,

@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { VerificationToken } from "../models/VerificationToken";
 import { User } from "../models/User";
-import { validateAccessToken } from "../lib/helpers";
 
 export async function verifyToken(req: Request, res: Response) {
   const { token } = req.query;

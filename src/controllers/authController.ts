@@ -1,5 +1,4 @@
 import { v6 } from "uuid";
-import { userExistsWithEmail } from "../db/users";
 
 import { User } from "../models/User";
 import bcrypt from "bcrypt";
@@ -21,12 +20,27 @@ export const login = async (req: Request, res: Response) => {
 
   const accessToken = v6();
   user.accessTokens.push(accessToken);
+  // res.cookie("accessToken", accessToken, {
+  //   httpOnly: true,
+  //   secure: false, // set to true in production (with HTTPS)
+  //   sameSite: "lax",
+  //   maxAge: 60 * 60 * 1000, // 1 hour
+  // });
   user.updatedAt = new Date();
   await user.save();
 
-  res.success(accessToken, "Login successful");
+  res.success({ accessToken }, "Login successful");
 };
 
+export const logout = async (req: Request, res: Response) => {
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: false,
+  });
+  res.json({ message: "Logged out" });
+};
 export const authController = {
   login,
+  logout,
 };

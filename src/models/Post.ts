@@ -18,15 +18,10 @@ const postSchema = new Schema({
     type: Date,
     default: Date.now,
   },
-  //   userId: {
-  //     type: Schema.Types.ObjectId,
-  //     ref: "User",
-  //   },
-  accessTokens: [
-    {
-      type: String,
-    },
-  ],
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+  },
 });
 
 const Post = mongoose.model("Post", postSchema);
